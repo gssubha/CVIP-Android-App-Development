@@ -1,0 +1,193 @@
+HTML 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div id="board"></div>
+    <button id="restart-btn" onclick="restartGame()">New Game</button>
+  </div>
+
+  <div id="result-screen" class="result-screen">
+    <div class="result-message-container">
+      <h2 id="result-message"></h2>
+      <button id="new-game-btn" onclick="restartGame()">New Game</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+CSS
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to bottom right, #3494e6, #ec6ead);
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+}
+
+#game-container {
+  text-align: center;
+  margin-bottom: 20px; 
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+#restart-btn,
+#new-game-btn,
+#restart-screen-btn {
+  background-color: #ec6ead;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  margin-top: 20px;
+  border-radius: 5px; 
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-gap: 5px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  background-color: #fff;
+  border: 2px solid #3494e6;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: #000; 
+  border-radius: 10px; 
+}
+
+.result-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  align-items: center;
+  justify-content: center;
+}
+
+.result-message-container {
+  text-align: center;
+}
+
+#result-message {
+  color: #000;
+}
+
+#result-screen button {
+  background-color: #ec6ead;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+
+
+JavaScript
+
+const board = document.getElementById('board');
+const resultScreen = document.getElementById('result-screen');
+const resultMessage = document.getElementById('result-message');
+const restartBtn = document.getElementById('restart-btn');
+
+let currentPlayer = 'X';
+let boardState = ['', '', '', '', '', '', '', '', ''];
+let gameActive = true;
+
+function cellClick(index) {
+  if (gameActive && boardState[index] === '') {
+    boardState[index] = currentPlayer;
+    renderBoard();
+    checkWinner();
+    togglePlayer();
+  }
+}
+
+function checkWinner() {
+  const winningCombos = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+    [0, 4, 8], [2, 4, 6]            
+  ];
+
+  for (const combo of winningCombos) {
+    const [a, b, c] = combo;
+    if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+      gameActive = false;
+      displayResult(`${currentPlayer} wins!`);
+      return;
+    }
+  }
+
+  if (!boardState.includes('')) {
+    gameActive = false;
+    displayResult('It\'s a draw!');
+  }
+}
+
+// Toggle between X and O
+function togglePlayer() {
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+}
+
+function renderBoard() {
+  board.innerHTML = '';
+  boardState.forEach((value, index) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.textContent = value;
+    cell.addEventListener('click', () => cellClick(index));
+    board.appendChild(cell);
+  });
+}
+
+function displayResult(message) {
+  resultMessage.textContent = message;
+  resultScreen.style.display = 'block';
+}
+
+function restartGame() {
+  gameActive = true;
+  currentPlayer = 'X';
+  boardState = ['', '', '', '', '', '', '', '', ''];
+  resultScreen.style.display = 'none';
+  renderBoard();
+}
+renderBoard();
